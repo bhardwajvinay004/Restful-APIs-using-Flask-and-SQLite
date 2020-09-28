@@ -6,7 +6,7 @@ This project was generated on 27th September, 2020.
 
 Run `python app.py` for a running the dev server. Navigate to `http://localhost:5000/`. The app will automatically reload if you change any of the source files.
 
-## Create Schema adn Insert JSON data
+## Create Schema and Insert JSON data
 
 To clean the SQLIte database, create a fresh schema and insert the JSON dump data; run `python jsonToSqlite.py`. This is create the fresh DB tables and insert the initial IMDB data.
 
