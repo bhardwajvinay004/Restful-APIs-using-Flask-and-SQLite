@@ -1,5 +1,5 @@
 """ app.py file
-This is main application file to be executed to run the application.
+    This is main application file to be executed to run the application.
 """
 from flask import Flask, request, jsonify
 import re
@@ -9,24 +9,25 @@ import queries as q
 app = Flask(__name__)
 app.config["DEBUG"] = True
 
-"""This is the route to the Home page of the Flask application.
-Simply welcomes the user on the application.
-Returns:
-    [str]: renders the HTML h1 tag with a mesage.
-"""
+
 @app.route('/', methods=['GET'])
 def home():
+  """ This is the route to the Home page of the Flask application.
+      Simply welcomes the user on the application.
+      Returns:
+        [str]: renders the HTML h1 tag with a mesage.
+  """
   if len(request.args.to_dict()):
     return '<h1> Please remove query parameter(s) and try again. </h1>', 400
 
   return '<h1> Welcome to IMDB Task Flask Application !! </h1>', 200
 
 
-"""This is a common function to retrieve the searched records from the database tables.
-Returns:
-    [list]: returns the list of records fetched from the db tables.
-"""
 def generateSearchResult(movie_details, cur):
+  """ This is a common function to retrieve the searched records from the database tables.
+      Returns:
+        [list]: returns the list of records fetched from the db tables.
+  """
   result = []
   for movie in movie_details:
     tmpDict = {}
@@ -49,11 +50,11 @@ def generateSearchResult(movie_details, cur):
   return result
 
 
-"""Fetches all the movies and their details completed.
-Returns:
-    [list]: returns the json list of records fetched from the db tables.
-"""
 def fetchAll():
+  """ Fetches all the movies and their details completed.
+      Returns:
+        [list]: returns the json list of records fetched from the db tables.
+  """
   conn = get_db_connection()
   cur = conn.cursor()
   result = None
@@ -66,11 +67,11 @@ def fetchAll():
   return jsonify(result)
 
 
-"""This is a common function to fetch the details of the searched field with exact match.
-Returns:
-    [list]: returns the json list of records fetched from the db tables.
-"""
 def searchByExactValue(key, value):
+  """ This is a common function to fetch the details of the searched field with exact match.
+      Returns:
+        [list]: returns the json list of records fetched from the db tables.
+  """
   conn = get_db_connection()
   cur = conn.cursor()
   result = None
@@ -100,12 +101,12 @@ def searchByExactValue(key, value):
   return jsonify(result)
 
 
-"""This is a common function to fetch the details of the searched field
-between a range of values (integer or float).
-Returns:
-    [list]: returns the json list of records fetched from the db tables.
-"""
 def searchByRange(key, start, end):
+  """ This is a common function to fetch the details of the searched field
+      between a range of values (integer or float).
+      Returns:
+        [list]: returns the json list of records fetched from the db tables.
+  """
   conn = get_db_connection()
   cur = conn.cursor()
   result = None
@@ -121,15 +122,15 @@ def searchByRange(key, start, end):
   return jsonify(result)
 
 
-"""This function route provides the ability to search from the IMDB data
-through Query Parameter filter options.
-Returns:
-    [list or string]: returns the json list of records fetched from the db tables
-    or displays the HTML tag with some message.
-"""
 @app.route('/movies', methods=['GET'])
 @app.route('/movies/', methods=['GET'])
 def get_movies():
+  """ This function route provides the ability to search from the IMDB data
+      through Query Parameter filter options.
+      Returns:
+        [list or string]: returns the json list of records fetched from the db tables
+        or displays the HTML tag with some message.
+  """
   query_params = request.args.to_dict()
 
   if len(query_params):
@@ -154,13 +155,13 @@ def get_movies():
     return fetchAll(), 200
 
 
-"""This function route provides an ability to view, update or delete an existing Movie Details.
-It uses movie_id to refer to the record in the database.
-Returns:
-    [dict or string]: returns the API successful or failure response.
-"""
 @app.route('/movies/<int:movie_id>', methods=['GET', 'PUT', 'DELETE'])
 def get_update_delete_movie(movie_id):
+  """ This function route provides an ability to view, update or delete an existing Movie Details.
+      It uses movie_id to refer to the record in the database.
+      Returns:
+        [dict or string]: returns the API successful or failure response.
+  """
   conn = get_db_connection()
   cur = conn.cursor()
 
@@ -254,12 +255,12 @@ def get_update_delete_movie(movie_id):
     return searchByExactValue('movie_id', movie_id), 200
 
 
-"""This function route provides an ability to add a new movie and it's details into the database.
-Returns:
-    [dict or string]: returns the API successful or failure response.
-"""
 @app.route('/movies/add', methods=['POST'])
 def add_new_movie():
+  """ This function route provides an ability to add a new movie and it's details into the database.
+      Returns:
+        [dict or string]: returns the API successful or failure response.
+  """
   conn = get_db_connection()
   cur = conn.cursor()
 
