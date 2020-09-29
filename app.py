@@ -161,9 +161,36 @@ Returns:
 """
 @app.route('/movies/<int:movie_id>', methods=['GET', 'PUT', 'DELETE'])
 def get_update_delete_movie(movie_id):
+  conn = get_db_connection()
+  cur = conn.cursor()
+
+  if request.method != 'GET':
+    payload = request.get_json()
+    try:
+      if payload["username"] and payload["password"]:
+        get_user = cur.execute(q.GET_ROLE_ID_BY_USERNAME_AND_PASSWORD, (payload["username"], payload["password"])).fetchone()
+        if get_user == None:
+          conn.close()
+          return 'You are not an authenticated user.', 401
+        else:
+          role_type = cur.execute(q.GET_ROLE_TYPE_BY_ROLE_ID, (get_user[0],)).fetchone()
+          if role_type == None or role_type[0] != 'admin':
+            conn.close()
+            if request.method == 'PUT':
+              return 'You are not authorized to update an existing movie.', 403
+            elif request.method == 'DELETE':
+              return 'You are not authorized to delete an existing movie.', 403
+          else:
+            pass
+      else:
+        conn.close()
+        return 'You are not an authenticated user.', 401
+    except Exception as e:
+      conn.close()
+      return 'You are not an authenticated user.', 401
+
+
   if request.method == 'DELETE':
-    conn = get_db_connection()
-    cur = conn.cursor()
     cur.execute(q.DELETE_MOVIE_ID_FROM_MOVIE_GENRE, (movie_id,))
     cur.execute(q.DELETE_MOVIE_BY_ID, (movie_id,))
 
@@ -179,10 +206,8 @@ def get_update_delete_movie(movie_id):
       else:
         pass
     except Exception as e:
+      conn.close()
       return 'Bad or Incomplete request payload', 400
-
-    conn = get_db_connection()
-    cur = conn.cursor()
 
     get_movie_details = cur.execute(q.GET_IDS_FROM_MOVIE_BY_NAME, (payload["name"],)).fetchall()
     for m in get_movie_details:
@@ -225,6 +250,7 @@ def get_update_delete_movie(movie_id):
 
     return jsonify({ "movie_id": movie_id, "message": "Successfully updated a movie." }), 200
   elif request.method == 'GET':
+    conn.close()
     return searchByExactValue('movie_id', movie_id), 200
 
 
@@ -234,17 +260,38 @@ Returns:
 """
 @app.route('/movies/add', methods=['POST'])
 def add_new_movie():
+  conn = get_db_connection()
+  cur = conn.cursor()
+
   payload = request.get_json()
+  try:
+    if payload["username"] and payload["password"]:
+      get_user = cur.execute(q.GET_ROLE_ID_BY_USERNAME_AND_PASSWORD, (payload["username"], payload["password"])).fetchone()
+      if get_user == None:
+        conn.close()
+        return 'You are not an authenticated user.', 401
+      else:
+        role_type = cur.execute(q.GET_ROLE_TYPE_BY_ROLE_ID, (get_user[0],)).fetchone()
+        if role_type == None or role_type[0] != 'admin':
+          conn.close()
+          return 'You are not authorized to add a new movie.', 403
+        else:
+          pass
+    else:
+      conn.close()
+      return 'You are not an authenticated user.', 401
+  except Exception as e:
+    conn.close()
+    return 'You are not an authenticated user.', 401
+
   try:
     if payload["name"] and payload["director"] and payload["genre"] and payload["imdb_score"] and payload["popularity"]:
       pass
     else:
       pass
   except Exception as e:
+    conn.close()
     return 'Bad or Incomplete request payload', 400
-
-  conn = get_db_connection()
-  cur = conn.cursor()
 
   get_movie_details = cur.execute(q.GET_DIRECTOR_ID_FROM_MOVIE, (payload["name"],)).fetchall()
   for m in get_movie_details:

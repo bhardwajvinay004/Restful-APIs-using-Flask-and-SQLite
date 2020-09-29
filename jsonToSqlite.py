@@ -7,6 +7,7 @@ from db_connection import get_db_connection
 import queries as q
 
 connection = get_db_connection()
+
 """Execute the scripts from the schema.sql file.
 """
 with open('schema.sql') as f:
@@ -14,18 +15,44 @@ with open('schema.sql') as f:
 
 cur = connection.cursor()
 
-"""Load the JSON dump data here from the JSON file.
+
+"""Load the JSON dump data from the user_role.json file.
 """
-data = json.load(open('imdb.json'))
+users_data = json.load(open('user_role.json'))
 
 """Loop through the loaded JSON data to insert it into the tables created above.
 """
-for movie in data:
+for user in users_data:
+  role_id = None
+
+  """Insert all new role name in ROLES table.
+  """
+  get_role = cur.execute(q.GET_ROLE_ID_BY_ROLE_TYPE, (user["role"],)).fetchone()
+  if get_role != None:
+    role_id = get_role[0]
+  else:
+    cur.execute(q.INSERT_NEW_ROLE_TYPE, (user["role"],))
+    get_role = cur.execute(q.GET_ROLE_ID_BY_ROLE_TYPE, (user["role"],)).fetchone()
+    role_id = get_role[0]
+
+  """Insert all user's details in USER table.
+  """
+  cur.execute(q.INSERT_NEW_USER, (user["username"], user["password"], role_id))
+
+
+
+"""Load the JSON dump data from the imdb.json file.
+"""
+movies_data = json.load(open('imdb.json'))
+
+"""Loop through the loaded JSON data to insert it into the tables created above.
+"""
+for movie in movies_data:
   director_id = None
   movie_id = None
   genre_ids = []
 
-  """Insert all the new Director name in DIRECTOR table.
+  """Insert all new Director name in DIRECTOR table.
   """
   get_director = cur.execute(q.GET_DIRECTOR_ID_BY_NAME, (movie["director"],)).fetchone()
   if get_director != None:
@@ -35,7 +62,7 @@ for movie in data:
     get_director = cur.execute(q.GET_DIRECTOR_ID_BY_NAME, (movie["director"],)).fetchone()
     director_id = get_director[0]
 
-  """Insert all the new Genre in GENRE table.
+  """Insert all new Genre in GENRE table.
   """
   for genre in movie['genre']:
     get_genre = cur.execute(q.GET_GENRE_ID_BY_NAME, (genre,)).fetchone()
@@ -46,7 +73,7 @@ for movie in data:
       get_genre = cur.execute(q.GET_GENRE_ID_BY_NAME, (genre,)).fetchone()
       genre_ids.append(get_genre[0])
 
-  """Insert all the movie's details in MOVIE table.
+  """Insert all movie's details in MOVIE table.
   """
   cur.execute(q.INSERT_NEW_MOVIE, (movie["name"], movie["imdb_score"], movie["99popularity"], director_id))
   get_movie = cur.execute(q.GET_MOVIE_ID_BY_NAME_AND_DIRECTOR_ID, (movie["name"], director_id)).fetchone()

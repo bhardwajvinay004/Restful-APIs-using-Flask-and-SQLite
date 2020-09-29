@@ -1,0 +1,22 @@
+[
+  {
+    "username": "super_admin",
+    "password": "super_admin@44444",
+    "role": "admin"
+  },
+  {
+    "username": "dev_user",
+    "password": "dev_user_password",
+    "role": "non-admin"
+  },
+  {
+    "username": "qa_user",
+    "password": "qa_user_password",
+    "role": "non-admin"
+  },
+  {
+    "username": "anonymous_user",
+    "password": "anonymous_user_password",
+    "role": "non-admin"
+  }
+]

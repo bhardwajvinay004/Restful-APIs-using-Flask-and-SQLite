@@ -1,5 +1,11 @@
 """Stores all the static strings of all the queries here.
 """
+GET_ROLE_ID_BY_ROLE_TYPE = "SELECT id FROM ROLES WHERE role_type=?"
+INSERT_NEW_ROLE_TYPE = "INSERT INTO ROLES (role_type) VALUES (?)"
+INSERT_NEW_USER = "INSERT INTO USER (user_name, password, role_id) VALUES (?, ?, ?)"
+GET_ROLE_ID_BY_USERNAME_AND_PASSWORD = "SELECT role_id FROM USER WHERE user_name=? AND password=?"
+GET_ROLE_TYPE_BY_ROLE_ID = "SELECT role_type FROM ROLES WHERE id=?"
+
 GET_DIRECTOR_ID_BY_NAME = "SELECT id FROM DIRECTOR WHERE name=?"
 INSERT_NEW_DIRECTOR_NAME = "INSERT INTO DIRECTOR (name) VALUES (?)"
 GET_GENRE_ID_BY_NAME = "SELECT id FROM GENRE WHERE name=?"
